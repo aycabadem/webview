@@ -15,7 +15,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _controller = Completer<WebViewController>();
+  late WebViewController _controller;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: WebView(
           initialUrl: "https://kiloloco.com",
-          onWebViewCreated: (controller) => _controller.complete(controller),
+          onWebViewCreated: (controller) => _controller = controller,
         ),
         bottomNavigationBar: Container(
           color: Theme.of(context).colorScheme.secondary,
@@ -35,10 +35,24 @@ class _MyAppState extends State<MyApp> {
             padding: const EdgeInsets.only(bottom: 20, right: 20),
             child: ButtonBar(
               children: [
-                navigationButton(
-                    Icons.chevron_left, (controller) => _goBack(controller)),
-                navigationButton(
-                    Icons.chevron_right, (controller) => _goForward(controller))
+                IconButton(
+                  icon: Icon(
+                    Icons.chevron_left,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => _goBack(_controller),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.chevron_right,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => _goForward(_controller),
+                ),
+                // navigationButton(
+                //     Icons.chevron_left, (controller) => _goBack(controller)),
+                // navigationButton(
+                //     Icons.chevron_right, (controller) => _goForward(controller))
               ],
             ),
           ),
@@ -47,23 +61,23 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget navigationButton(
-      IconData icon, Function(WebViewController) onPressed) {
-    return FutureBuilder(
-        future: _controller.future,
-        builder: (context, AsyncSnapshot<WebViewController> snapshot) {
-          if (snapshot.hasData) {
-            return IconButton(
-                icon: Icon(
-                  icon,
-                  color: Colors.white,
-                ),
-                onPressed: () => onPressed(snapshot.data!));
-          } else {
-            return Container();
-          }
-        });
-  }
+  // Widget navigationButton(
+  //     IconData icon, Function(WebViewController) onPressed) {
+  //   return FutureBuilder(
+  //       future: _controller.future,
+  //       builder: (context, AsyncSnapshot<WebViewController> snapshot) {
+  //         if (snapshot.hasData) {
+  //           return IconButton(
+  //               icon: Icon(
+  //                 icon,
+  //                 color: Colors.white,
+  //               ),
+  //               onPressed: () => onPressed(snapshot.data!));
+  //         } else {
+  //           return Container();
+  //         }
+  //       });
+  // }
 
   void _goBack(WebViewController controller) async {
     final canGoBack = await controller.canGoBack();
